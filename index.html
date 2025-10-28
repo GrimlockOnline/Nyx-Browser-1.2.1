@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nyx Browser - Eco-Friendly Student Browser</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .titlebar {
+      background: #0f0f0f;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .titlebar-title {
+      font-size: 12px;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .titlebar-controls {
+      display: flex;
+      gap: 4px;
+    }
+
+    .titlebar-controls button {
+      width: 46px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .titlebar-controls button:hover {
+      background: #2a2a2a;
+      color: #fff;
+    }
+
+    .titlebar-controls .close:hover {
+      background: #e81123;
+      color: #fff;
+    }
+
+    .dashboard {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard.collapsed {
+      height: 0;
+      padding: 0;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard:not(.collapsed) {
+      height: 40px;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-stats {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      font-size: 12px;
+    }
+
+    .dashboard-stat:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dashboard-badges {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      animation: badgePop 0.3s ease;
+    }
+
+    @keyframes badgePop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .dashboard-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px;
+    }
+
+    .dashboard-toggle:hover {
+      color: white;
+    }
+
+    .toolbar {
+      background: #0f0f0f;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .nav-btn, .tool-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #2a2a2a;
+      color: #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover, .tool-btn:hover {
+      background: #3a3a3a;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .url-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #2a2a2a;
+      border-radius: 8px;
+      padding: 0 12px;
+      gap: 8px;
+    }
+
+    .search-dropdown {
+      background: #3a3a3a;
+      border: 1px solid #4a4a4a;
+      border-radius: 4px;
+      color: #e0e0e0;
+      font-size: 12px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .url-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #e0e0e0;
+      font-size: 14px;
+      outline: none;
+      padding: 8px 0;
+    }
+
+    .shield-icon {
+      color: #4ade80;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .eco-badge {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tabs-container {
+      background: #0f0f0f;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 8px;
+      border-bottom: 1px solid #2a2a2a;
+      overflow-x: auto;
+      height: 36px;
+    }
+
+    .tab {
+      min-width: 180px;
+      max-width: 240px;
+      height: 32px;
+      background: #1a1a1a;
+      border-radius: 8px 8px 0 0;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: 1px solid #2a2a2a;
+      border-bottom: none;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .tab.dragging {
+      opacity: 0.5;
+    }
+
+    .tab:hover {
+      background: #252525;
+    }
+
+    .tab.active {
+      background: #2a2a2a;
+      border-color: #3a3a3a;
+    }
+
+    .tab-title {
+      flex: 1;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-close {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      opacity: 0.6;
+      transition: all 0.2s;
+    }
+
+    .tab-close:hover {
+      opacity: 1;
+      background: #3a3a3a;
+    }
+
+    .tab-preview {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 8px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      max-width: 200px;
+    }
+
+    .tab:hover .tab-preview {
+      opacity: 1;
+    }
+
+    .new-tab-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #2a2a2a;
+      color: #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+
+    .new-tab-btn:hover {
+      background: #3a3a3a;
+    }
+
+    .close-all-tabs-btn {
+      width: 42px;
+      height: 32px;
+      border: none;
+      background: #ef4444;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+      margin-left: 4px;
+    }
+
+    .close-all-tabs-btn:hover {
+      background: #dc2626;
+    }
+    .main-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #webviewContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    webview {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+    }
+
+    .start-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      z-index: 1;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .main-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+    }
+
+    iframe.active {
+      display: block;
+    }
+
+    .start-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+
+    .start-logo {
+      font-size: 64px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .start-tagline {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-bottom: 40px;
+    }
+
+    .search-box-large {
+      width: 100%;
+      max-width: 600px;
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 16px;
+      color: #e0e0e0;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .search-box-large:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .sidebar {
+      width: 320px;
+      background: #0f0f0f;
+      border-left: 1px solid #2a2a2a;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar.hidden {
+      display: none;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid #2a2a2a;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-close {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .sidebar-content {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .notes-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .notes-search {
+      flex: 1;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #e0e0e0;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .folder-selector {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #e0e0e0;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .note-item {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .note-tags {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .note-tag {
+      background: #10b981;
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    .tag-input {
+      background: transparent;
+      border: 1px solid #3a3a3a;
+      color: #10b981;
+      font-size: 11px;
+      outline: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      flex: 1;
+    }
+
+    .micro-feedback {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 2000;
+      display: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1a1a1a;
+      border: 1px solid #3a3a3a;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #e0e0e0;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: #10b981;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #059669;
+    }
+
+    .btn-secondary {
+      background: #3a3a3a;
+      color: #e0e0e0;
+    }
+
+    .btn-secondary:hover {
+      background: #4a4a4a;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .list-item {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .list-item-content {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .list-item-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .list-item-subtitle {
+      font-size: 12px;
+      color: #888;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .list-item-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .icon-btn:hover {
+      color: #e0e0e0;
+    }
+
+    .study-mode-banner {
+      display: none;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      padding: 8px 16px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .study-mode-banner.active {
+      display: block;
+    }
+
+    .timer-display {
+      font-size: 32px;
+      font-weight: 700;
+      color: #10b981;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .pomodoro-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .pomodoro-btn {
+      flex: 1;
+      padding: 8px;
+      border: 2px solid #3a3a3a;
+      background: #2a2a2a;
+      color: #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pomodoro-btn.active {
+      border-color: #10b981;
+      background: #10b98120;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .sustainability-card {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .sustainability-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .sustainability-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 4px;
+    }
+
+    .sustainability-label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .sustainability-detail {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .course-folder {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .course-folder:hover {
+      background: #3a3a3a;
+      border-color: #10b981;
+    }
+
+    .folder-icon {
+      font-size: 20px;
+    }
+
+    .folder-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3a3a3a;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4a4a4a;
+    }
+  </style>
+</head>
+<body>
+  <div class="titlebar">
+    <div class="titlebar-title">
+      <span>🌙</span>
+      <span>Nyx Browser</span>
+    </div>
+    <div class="titlebar-controls">
+      <button onclick="minimizeWindow()">−</button>
+      <button onclick="maximizeWindow()">□</button>
+      <button class="close" onclick="closeWindow()">×</button>
+    </div>
+  </div>
+
+  <div class="dashboard" id="dashboard">
+    <div class="dashboard-stats">
+      <div class="dashboard-stat" onclick="expandStat('co2')" title="Click for details">
+        🌱 CO₂: <span id="dashboardCO2">0g</span>
+      </div>
+      <div class="dashboard-stat" onclick="expandStat('trackers')" title="Click for details">
+        🛡️ Trackers: <span id="dashboardTrackers">0</span>
+      </div>
+      <div class="dashboard-stat" onclick="expandStat('study')" title="Click for details">
+        🎯 Study: <span id="dashboardStudy">0</span>
+      </div>
+      <div class="dashboard-stat" onclick="expandStat('notes')" title="Click for details">
+        📝 Notes: <span id="dashboardNotes">0</span>
+      </div>
+      <div class="dashboard-stat" onclick="openSustainabilityDashboard()" title="Sustainability Dashboard">
+        💾 Data: <span id="dashboardDataSaved">0MB</span>
+      </div>
+      <div class="dashboard-stat" onclick="openSustainabilityDashboard()" title="Energy Saved">
+        ⚡ Energy: <span id="dashboardEnergySaved">0Wh</span>
+      </div>
+    </div>
+    <div class="dashboard-badges" id="dashboardBadges"></div>
+    <button class="dashboard-toggle" onclick="toggleDashboard()">−</button>
+  </div>
+
+  <div class="study-mode-banner" id="studyModeBanner">
+    🎯 Study Mode Active - Stay focused!
+  </div>
+
+  <div class="toolbar">
+    <div class="nav-buttons">
+      <button class="nav-btn" id="backBtn" onclick="goBack()">←</button>
+      <button class="nav-btn" id="forwardBtn" onclick="goForward()">→</button>
+      <button class="nav-btn" onclick="reloadPage()">↻</button>
+    </div>
+
+    <div class="url-bar">
+      <span class="shield-icon" title="Nyx Protection Active">🛡️</span>
+      <div class="search-engine-selector">
+        <select class="search-dropdown" id="searchEngineDropdown" onchange="changeSearchEngine()">
+          <option value="ecosia">Ecosia 🌱</option>
+          <option value="google">Google</option>
+          <option value="duckduckgo">DuckDuckGo 🦆</option>
+        </select>
+      </div>
+      <input
+        type="text"
+        class="url-input"
+        id="urlInput"
+        placeholder="Search or enter URL..."
+        onkeypress="handleUrlEnter(event)"
+      >
+      <div class="eco-badge" title="CO₂ Saved">
+        🌱 <span id="co2Display">0</span>g
+      </div>
+    </div>
+
+    <button class="tool-btn" onclick="openSessionManager()" title="Session Manager">💾</button>
+    <button class="tool-btn" onclick="openSustainabilityDashboard()" title="Sustainability">🌍</button>
+    <button class="tool-btn" onclick="openAIHelper()" title="AI Quick Help">🤖</button>
+    <button class="tool-btn" onclick="toggleStudyMode()" title="Study Mode">🎯</button>
+    <button class="tool-btn" onclick="toggleNotes()" title="Notes">📝</button>
+    <button class="tool-btn" onclick="openDownloads()" title="Downloads">⬇️</button>
+    <button class="tool-btn" onclick="openHistory()" title="History">📚</button>
+    <button class="tool-btn" onclick="openBookmarks()" title="Bookmarks">⭐</button>
+    <button class="tool-btn" onclick="openSettings()" title="Settings">⚙️</button>
+  </div>
+
+  <div class="tabs-container" id="tabsContainer"></div>
+
+  <div class="content">
+    <div class="main-view">
+      <div class="start-page" id="startPage">
+        <div class="start-logo">NYX</div>
+        <div class="start-tagline">The Eco-Friendly Student Browser</div>
+        <input
+          type="text"
+          class="search-box-large"
+          id="startSearch"
+          placeholder="Search the web or enter a URL..."
+          onkeypress="handleStartSearch(event)"
+        >
+        <div class="quick-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="statCO2">0g</div>
+            <div class="stat-label">CO₂ Saved</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statTrackers">0</div>
+            <div class="stat-label">Trackers Blocked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statStudy">0</div>
+            <div class="stat-label">Study Sessions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statNotes">0</div>
+            <div class="stat-label">Notes Saved</div>
+          </div>
+        </div>
+      </div>
+      <div id="webviewContainer"></div>
+    </div>
+
+    <div class="sidebar hidden" id="notesSidebar">
+      <div class="sidebar-header">
+        📝 Notes & Research
+        <button class="sidebar-close" onclick="toggleNotes()">×</button>
+      </div>
+      <div class="sidebar-content">
+        <div class="notes-controls">
+          <input type="text" class="notes-search" id="notesSearch" placeholder="Search notes..." oninput="filterNotes()">
+          <select class="folder-selector" id="folderSelector" onchange="filterNotes()">
+            <option value="all">All Folders</option>
+            <option value="general">General</option>
+            <option value="study">Study</option>
+            <option value="research">Research</option>
+            <option value="personal">Personal</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <textarea class="form-textarea" id="noteInput" placeholder="Write your notes here..."></textarea>
+          <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+            <input type="text" class="tag-input" id="tagInput" placeholder="Add tags (#exam, #research)">
+            <select class="folder-selector" id="noteFolderSelect">
+              <option value="general">General</option>
+              <option value="study">Study</option>
+              <option value="research">Research</option>
+              <option value="personal">Personal</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveNote()" style="width: 100%; margin-bottom: 12px;">Save Note</button>
+        <button class="btn btn-secondary" onclick="exportNotes()" style="width: 100%; margin-bottom: 20px;">Export All</button>
+
+        <div id="notesList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="microFeedback" class="micro-feedback"></div>
+
+  <!-- All Modals (Session, Sustainability, AI Helper, Study Mode, History, Downloads, Bookmarks, Settings) -->
+  <div class="modal" id="sessionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">💾 Session Manager</div>
+        <button class="modal-close" onclick="closeSessionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; color: #888;">Nyx automatically saves your browsing session. You can restore it when you reopen the browser.</p>
+        <div id="sessionInfo"></div>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button class="btn btn-primary" onclick="saveSession(); showMicroFeedback('Session saved!');" style="flex: 1;">Save Session Now</button>
+          <button class="btn btn-danger" onclick="clearSession()">Clear Session</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="sustainabilityModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">🌍 Sustainability Dashboard</div>
+        <button class="modal-close" onclick="closeSustainabilityModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; color: #888;">Track your environmental impact while browsing with Nyx.</p>
+        <div id="sustainabilityStats"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="aiHelperModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">🤖 AI Quick Help</div>
+        <button class="modal-close" onclick="closeAIHelperModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; color: #888;">Ask for instant summaries, definitions, or study help.</p>
+        <div class="form-group">
+          <textarea class="form-textarea" id="aiQueryInput" placeholder="What would you like help with?"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="sendAIQuery()" style="width: 100%; margin-bottom: 16px;">Ask AI</button>
+        <div id="aiResponse" style="padding: 16px; background: #2a2a2a; border-radius: 8px; min-height: 100px;"></div>
+        <p style="margin-top: 12px; font-size: 12px; color: #888;">Note: AI integration is a planned feature and will be available in a future update.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="studyModeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">🎯 Focus Mode</div>
+        <button class="modal-close" onclick="closeStudyModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="pomodoro-selector">
+          <button class="pomodoro-btn active" onclick="setPomodoroTime(25)">25 min</button>
+          <button class="pomodoro-btn" onclick="setPomodoroTime(45)">45 min</button>
+          <button class="pomodoro-btn" onclick="setPomodoroTime(60)">60 min</button>
+        </div>
+        <div class="timer-display" id="timerDisplay">25:00</div>
+        <div class="timer-controls">
+          <button class="btn btn-primary" onclick="startTimer()">Start</button>
+          <button class="btn btn-secondary" onclick="pauseTimer()">Pause</button>
+          <button class="btn btn-danger" onclick="stopTimer()">Stop</button>
+        </div>
+        <div class="form-group" style="margin-top: 20px;">
+          <label class="form-label">Whitelist Websites (one per line)</label>
+          <textarea class="form-textarea" id="whitelistInput" placeholder="https://example.com"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveWhitelist()" style="width: 100%;">Save Whitelist</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="historyModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📚 History</div>
+        <button class="modal-close" onclick="closeHistoryModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <button class="btn btn-danger" onclick="clearHistory()" style="margin-bottom: 16px;">Clear All History</button>
+        <div id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="downloadsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">⬇️ Downloads</div>
+        <button class="modal-close" onclick="closeDownloadsModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="downloadsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="bookmarksModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">⭐ Bookmarks</div>
+        <button class="modal-close" onclick="closeBookmarksModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Course Folders</label>
+          <div id="courseBookmarkFolders"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select Folder for New Bookmark</label>
+          <select class="form-input" id="bookmarkFolderSelect"></select>
+        </div>
+        <button class="btn btn-primary" onclick="addCurrentBookmark()" style="width: 100%; margin-bottom: 16px;">Bookmark Current Page</button>
+        <div id="bookmarksList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ Settings</div>
+        <button class="modal-close" onclick="closeSettingsModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <h3 style="margin-bottom: 12px;">Nyx Protection</h3>
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="blockAds" checked onchange="saveSettings()">
+            <span>Block Ads & Trackers</span>
+          </label>
+        </div>
+
+        <h3 style="margin: 20px 0 12px;">Default Search Engine</h3>
+        <div class="form-group">
+          <select class="form-input" id="searchEngine" onchange="saveSettings()">
+            <option value="ecosia">Ecosia (Plants Trees)</option>
+            <option value="google">Google</option>
+            <option value="duckduckgo">DuckDuckGo</option>
+          </select>
+        </div>
+
+        <h3 style="margin: 20px 0 12px;">Theme</h3>
+        <div class="form-group">
+          <select class="form-input" id="theme" onchange="saveSettings()">
+            <option value="dark">Dark</option>
+            <option value="eco">Eco Green</option>
+            <option value="student">Student Blue</option>
+          </select>
+        </div>
+
+        <h3 style="margin: 20px 0 12px;">Data Management</h3>
+        <button class="btn btn-danger" onclick="clearAllData()" style="width: 100%;">Clear All Browser Data</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Stub for window controls when not in Electron
+    function minimizeWindow() {
+      console.log('Minimize window');
+    }
+
+    function maximizeWindow() {
+      console.log('Maximize/restore window');
+    }
+
+    function closeWindow() {
+      window.close();
+    }
+  </script>
+  <script src="browser.js"></script>
+</body>
+</html>

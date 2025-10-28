@@ -1,0 +1,47 @@
+{
+  "name": "nyx-browser",
+  "version": "1.2.1",
+  "description": "Nyx Browser",
+  "author": "Aethar Tech",
+  "main": "main.js",
+ "scripts": {
+  "start": "electron .",
+  "build": "electron-builder",
+  "build-win": "electron-builder --windows",
+  "dist": "electron-builder"
+},
+
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.nyx.browser",
+    "productName": "Nyx Browser",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "logo.ico",
+      "legalTrademarks": "Made by Aethar Tech"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "dependencies": {
+    "@ghostery/adblocker-electron": "^2.11.6",
+    "@ghostery/adblocker-electron-preload": "^2.11.6",
+    "node-fetch": "^2.7.0",
+    "uuid": "^8.3.2"
+  }
+}
